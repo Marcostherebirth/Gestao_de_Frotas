@@ -1,0 +1,24 @@
+GESTÃO DE FROTA RL CONNECT — BASE MIGRADA
+
+Esta pasta contém o aplicativo Streamlit, o banco SQLite já preenchido e a planilha original como cópia de segurança.
+
+Como usar:
+1. Instale Python 3.10+ no computador servidor.
+2. Abra o Prompt/PowerShell nesta pasta.
+3. Execute: python -m pip install streamlit pandas openpyxl
+4. Execute: python -m streamlit run app.py
+5. Acesse: http://localhost:8501
+
+Para outros computadores na mesma rede, inicie com:
+python -m streamlit run app.py --server.address 0.0.0.0
+E acesse http://IP_DO_SERVIDOR:8501. Libere a porta 8501 no Firewall do Windows.
+
+IMPORTAÇÃO REALIZADA:
+- Veículos: 3 (PYX0A29, KXS1J57, PVW9189)
+- Histórico de manutenções: 163 registros
+- Contatos: importados da aba CONTATOS
+- Datas ausentes permaneceram vazias; nenhum dado foi inventado.
+- Os campos extras da planilha foram preservados nas observações dos registros.
+- Divergências entre placas das abas e cabeçalhos foram mantidas nas observações do veículo para conferência.
+
+IMPORTANTE: faça backup do arquivo frota.db antes de substituir uma base já existente. O banco nesta pasta foi criado a partir da planilha enviada.

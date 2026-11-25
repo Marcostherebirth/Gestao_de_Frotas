@@ -1,0 +1,126 @@
+
+# Gestão de Manutenção de Frota — RL Connect
+
+## O que o sistema faz
+- Cadastro de vários veículos e atualização de quilometragem.
+- Registro de manutenções preventivas e corretivas, custo, oficina e observações.
+- Importação inicial do catálogo de serviços da planilha Excel fornecida.
+- Previsão de próxima manutenção por quilometragem ou por dias.
+- Painel com alertas vencidos/próximos e relatórios de custos.
+- Banco de dados local SQLite (`frota.db`).
+
+## Instalação no Windows
+1. Instale Python 3.10 ou superior.
+2. Extraia o ZIP para uma pasta, por exemplo `C:\RLConnect\GestaoFrota`.
+3. Copie a planilha original `Controle de Manutenção Preventiva_RL Connect.xlsx` para essa mesma pasta.
+4. Abra o PowerShell nessa pasta e execute:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -m streamlit run app.py
+```
+
+5. O navegador abrirá o sistema. Se não abrir automaticamente, acesse `http://localhost:8501`.
+
+## Primeiro acesso
+- O sistema importa o catálogo da aba "Principais Manutenções".
+- Se encontrar a placa e o odômetro no cabeçalho da aba "Manutenções", cadastra esse veículo como ponto de partida.
+- O histórico de serviços não é importado automaticamente porque a planilha contém fórmulas e não há registros preenchidos identificáveis com segurança. Cadastre ou importe os lançamentos após conferência.
+
+## Backup
+Feche o sistema e copie o arquivo `frota.db` para um local seguro. Esse arquivo contém os cadastros e o histórico.
+
+## Regras de alerta iniciais
+- Quilometragem: "Próxima" quando faltam até 1.000 km; "Vencida" quando o limite foi atingido ou ultrapassado.
+- Tempo: "Próxima" quando faltam até 30 dias; "Vencida" após a data limite.
+- Esses limites são configuráveis no código e devem ser ajustados conforme a política da frota.
+- Os prazos do catálogo são referências da planilha, não substituem o manual do fabricante.
+
+## Limitação desta primeira versão
+Aplicação local para uso em um computador/rede local. Para vários usuários simultâneos, login, permissões e acesso remoto, recomenda-se evoluir para uma versão web com servidor e banco de dados central.
+
+
+## Atualização — Ficha individual do veículo
+A nova aba "Ficha do veículo" apresenta:
+- Dados e quilometragem do veículo selecionado.
+- Quantidade de manutenções e custo acumulado registrado.
+- Próximas manutenções calculadas pelo catálogo e pelo histórico.
+- Histórico completo, oficina, observações e exportação CSV.
+- Custos agrupados por serviço.
+- Sinalização exploratória de descrições repetidas nas observações (não substitui diagnóstico técnico).
+
+### Atualizar uma instalação existente
+1. Faça uma cópia de segurança do arquivo `frota.db`.
+2. Feche o Streamlit com `CTRL + C` no terminal.
+3. Substitua o arquivo `app.py` pelo atualizado deste pacote.
+4. Mantenha o seu `frota.db` existente para preservar os cadastros.
+5. Confirme que a planilha Excel está na mesma pasta do `app.py`.
+6. Inicie novamente: `python -m streamlit run app.py`.
+
+A importação inicial do veículo-base foi corrigida para ler a placa em E6 e o odômetro em I6. Se a frota já tiver veículos cadastrados, a importação não duplica registros.
+
+
+## Atualização visual — versão 2.1
+A interface recebeu uma identidade visual inspirada na referência enviada:
+- Fundo cinza muito claro.
+- Azul-petróleo escuro na barra lateral.
+- Verde-azulado nos botões e na aba selecionada.
+- Cartões brancos com bordas discretas para indicadores.
+- Tipografia e espaçamentos mais compactos.
+- Tabelas com contorno e aparência mais próxima de um painel administrativo.
+
+Para atualizar, pare o servidor com CTRL+C, substitua somente `app.py` pelo arquivo desta versão e execute novamente. Preserve `frota.db`.
+
+
+## Atualização — Menu lateral por módulos
+A navegação agora fica em um menu lateral com as seções:
+- Visão geral: Painel.
+- Operacional: Registrar manutenção e Agenda de manutenção.
+- Frota: Veículos e Ficha do veículo.
+- Financeiro: Relatórios e custos.
+- Sistema: Configurações e consulta/exportação do catálogo.
+
+A tela inicial abre no Painel. A seleção do menu é mantida durante a sessão.
+Para atualizar uma instalação existente, faça backup do `frota.db`, pare o Streamlit com CTRL+C e substitua somente `app.py`.
+
+
+## Atualização — Edição de veículos
+Na seção Frota > Veículos agora existe:
+- Formulário para editar placa, modelo/versão, ano, motorista, quilometragem e observações.
+- Validação para impedir placa duplicada.
+- Opção de desativar cadastro incorreto sem excluir o histórico de manutenções.
+- Atualização de odômetro separada da edição cadastral.
+
+Para atualizar uma instalação existente: pare o Streamlit com CTRL+C, faça backup do `frota.db`, substitua somente `app.py` e inicie novamente. O banco existente deve ser preservado.
+
+
+## Atualização — Exclusão permanente de veículo (v3.2)
+Em Frota > Veículos, após selecionar um veículo, existe a seção "Excluir veículo cadastrado incorretamente".
+A exclusão exige confirmação explícita e remove também as manutenções vinculadas ao veículo.
+Isso libera a placa para um novo cadastro. A operação é permanente; faça backup do `frota.db` antes.
+Para atualizar, pare o Streamlit com CTRL+C e substitua somente `app.py`, preservando o banco `frota.db`.
+
+
+## Correção adicional — veículos inativos visíveis (v3.3)
+A tela Frota > Veículos agora lista todos os veículos, inclusive os desativados.
+A placa permanece única no SQLite mesmo após desativar um cadastro. Portanto, um veículo inativo precisa ser selecionado e excluído permanentemente antes de cadastrar a mesma placa novamente.
+Na lista, veículos ativos aparecem primeiro; os inativos também ficam disponíveis para edição e exclusão.
+Atualização: pare o Streamlit com CTRL+C, faça backup de `frota.db`, substitua somente `app.py` e reinicie.
+
+
+## Versão 3.4 — Reativar veículo
+Em Frota > Veículos, selecione o veículo na lista (ativos e inativos aparecem).
+Se o veículo estiver inativo, a seção "Reativar veículo" será exibida.
+Marque a confirmação e clique em "Reativar veículo selecionado".
+O registro e o histórico são preservados; apenas o campo active volta para 1.
+A tabela agora mostra Ativo como Sim/Não.
+Atualização: pare o Streamlit com CTRL+C, faça backup do frota.db e substitua somente app.py.
+
+
+## Versão 3.5 — Correção efetiva do botão Reativar
+A seção de reativação foi inserida diretamente no app.py após a ação de desativação.
+Para acessar: Frota > Veículos > selecione um veículo inativo no seletor "Selecione o veículo que deseja corrigir". A seção Reativar veículo aparece abaixo de Desativar veículo.
+Marque a confirmação e clique em "Reativar veículo selecionado".
+Substitua somente app.py, preservando frota.db. Reinicie o Streamlit após parar com CTRL+C.
